@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 
+// The open houses are on this date
+const EVENT_DATE = new Date(2026, 2, 22); // March 22, 2026
+
 export function useLiveClock(intervalMs = 60_000) {
   const [now, setNow] = useState(() => new Date());
 
@@ -12,19 +15,19 @@ export function useLiveClock(intervalMs = 60_000) {
   return now;
 }
 
+function eventTime(h: number, m: number): Date {
+  const d = new Date(EVENT_DATE);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
 export function isSlotPast(endTime: string, now: Date): boolean {
   const [h, m] = endTime.split(":").map(Number);
-  const end = new Date(now);
-  end.setHours(h, m, 0, 0);
-  return now > end;
+  return now > eventTime(h, m);
 }
 
 export function isSlotActive(startTime: string, endTime: string, now: Date): boolean {
   const [sh, sm] = startTime.split(":").map(Number);
   const [eh, em] = endTime.split(":").map(Number);
-  const start = new Date(now);
-  start.setHours(sh, sm, 0, 0);
-  const end = new Date(now);
-  end.setHours(eh, em, 0, 0);
-  return now >= start && now <= end;
+  return now >= eventTime(sh, sm) && now <= eventTime(eh, em);
 }
